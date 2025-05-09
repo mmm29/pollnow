@@ -1,5 +1,5 @@
 import { Context, createContext, ReactNode, useContext, useState } from "react";
-import { apiClient } from "../api";
+import { AuthService } from "@/domain";
 
 export type LoginParams = {
   username: string;
@@ -12,7 +12,7 @@ export type AuthContextType = {
   loginAction: (params: LoginParams) => Promise<void>;
 };
 
-const AuthContext: Context<AuthContextType | null> = createContext(null);
+const AuthContext: Context<AuthContextType | null> = createContext(null as any);
 
 export function useAuth(): AuthContextType {
   const auth = useContext(AuthContext);
@@ -22,7 +22,13 @@ export function useAuth(): AuthContextType {
   return auth;
 }
 
-export function AuthContextProvider({ children }: { children: ReactNode }) {
+export function AuthContextProvider({
+  authService,
+  children,
+}: {
+  authService: AuthService;
+  children: ReactNode;
+}) {
   const [user, setUser] = useState<string | null>(null);
 
   async function loginAction(params: LoginParams) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TextInput } from "../components/TextInput";
 import { Button } from "../components/Button";
-import { useAuth } from "../services/auth";
+import { useAuth } from "../hooks/auth";
 import { RedirectToHome } from "../router";
 
 export default function LoginPage() {

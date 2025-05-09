@@ -1,7 +1,7 @@
 import { Router } from "./router";
 
 import "./styles.css";
-import { AuthContextProvider } from "./services/auth";
+import { AuthContextProvider } from "./hooks/auth";
 
 export function App() {
   return (

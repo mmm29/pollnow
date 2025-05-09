@@ -1,4 +1,4 @@
-import { useAuth } from "../services/auth";
+import { useAuth } from "../hooks/auth";
 import { RedirectToLogin } from "../router";
 
 export default function HomePage() {
