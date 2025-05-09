@@ -22,12 +22,12 @@ export default function LoginPage() {
   async function handleSubmit() {
     // TODO: validate params
 
+    setProcessing(true);
+
     const loginResult = await auth.loginAction({
       username: name,
       password,
     });
-
-    // TODO: handle result
 
     setProcessing(false);
 

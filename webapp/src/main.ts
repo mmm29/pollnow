@@ -1,4 +1,4 @@
 import { createApplication } from "./domain";
-import { renderApp } from "./ui/main";
+import { renderUi } from "./ui/main";
 
-renderApp(createApplication());
+renderUi(createApplication());

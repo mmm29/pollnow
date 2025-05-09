@@ -15,6 +15,10 @@ export type AuthContextType = {
 
 const AuthContext: Context<AuthContextType | null> = createContext(null as any);
 
+export function isInitialized() {
+  return useContext(AuthContext) !== null;
+}
+
 export function useAuth(): AuthContextType {
   const auth = useContext(AuthContext);
   if (!auth) {
@@ -30,7 +34,19 @@ export function AuthContextProvider({
   authService: AuthService;
   children: ReactNode;
 }) {
+  const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<string | null>(null);
+
+  async function initializeUser() {
+    const me = await authService.getMe();
+    setInitialized(true);
+
+    if (me == null) {
+      return;
+    }
+
+    setUser(me.username);
+  }
 
   async function loginAction(params: LoginParams) {
     // Login
@@ -51,6 +67,12 @@ export function AuthContextProvider({
 
     setUser(me.username);
     return ok();
+  }
+
+  initializeUser();
+
+  if (!initialized) {
+    return <>{children}</>;
   }
 
   const authContext: AuthContextType = {
