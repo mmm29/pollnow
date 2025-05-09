@@ -1,4 +1,9 @@
 {
     "name": "go",
-    "image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm"
+    "image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20"
+        }
+    }
 }
