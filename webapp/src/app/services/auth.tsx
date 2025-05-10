@@ -1,14 +1,11 @@
-import { User } from "@/domain/models";
+import { User } from "@/app/models";
 import { err, ok, Result } from "neverthrow";
 
 export interface AuthService {
-  getMe: () => Promise<User | null>;
-  login: (username: string, password: string) => Promise<Result<void, string>>;
-  register: (
-    username: string,
-    password: string
-  ) => Promise<Result<void, string>>;
-  logout: () => Promise<void>;
+  getMe(): Promise<User | null>;
+  login(username: string, password: string): Promise<Result<void, string>>;
+  register(username: string, password: string): Promise<Result<void, string>>;
+  logout(): Promise<void>;
 }
 
 export function createAuthService(): AuthService {

@@ -1,5 +1,8 @@
 import { stringifyError } from "../utils";
 
+import { PollDto } from "@/app/dto";
+import { PollId } from "@/app/models";
+
 export class ApiClient {
   endpoint: string;
 
@@ -7,24 +10,37 @@ export class ApiClient {
     this.endpoint = endpoint;
   }
 
-  async getMe(): Promise<ApiResult<User | null>> {
+  //
+  // Authentication
+  async getMe(): Promise<ApiResult<UserDto | null>> {
     return await this._get("/me");
   }
 
-  async login(username: string, password: string): Promise<ApiResult<User>> {
+  async login(username: string, password: string): Promise<ApiResult<UserDto>> {
     return await this._post("/login", {
       username,
       password,
     });
   }
 
-  async register(username: string, password: string): Promise<ApiResult<User>> {
+  async register(
+    username: string,
+    password: string
+  ): Promise<ApiResult<UserDto>> {
     return await this._post("/register", {
       username,
       password,
     });
   }
 
+  //
+  // Poll
+  async createPoll(poll: PollDto): Promise<ApiResult<PollId>> {
+    return await this._post("/poll", poll);
+  }
+
+  //
+  // Service
   async _get<T>(path: string): Promise<ApiResult<T>> {
     return await this._request("GET", path, null);
   }
@@ -83,15 +99,17 @@ export class ApiClient {
   }
 }
 
-export type User = {
+export type UserDto = {
   username: string;
 };
 
-export type ApiResult<T> = {
-  ok: boolean;
-  status: number;
-  data?: T;
-  error_message?: string;
-};
-
-export const apiClient = new ApiClient("http://localhost:8114");
+export type ApiResult<T> = { status: number } & (
+  | {
+      ok: false;
+      error_message: string;
+    }
+  | {
+      ok: true;
+      data: T;
+    }
+);

@@ -3,16 +3,14 @@ import { createRoot } from "react-dom/client";
 
 import "./styles.css";
 
-import { Application } from "@/domain";
+import { Application } from "@/app";
 
 import { BRoutes } from "./router";
-import {
-  AuthContextProvider,
-  isInitialized as isAuthInitialized,
-} from "./hooks/auth";
+import { AuthProvider, isInitialized as isAuthInitialized } from "./hooks/auth";
 import { ReactNode } from "react";
 import { LoadingScreen } from "./pages/LoadingScreen";
 import { BrowserRouter } from "react-router-dom";
+import { AppProvider } from "./hooks/app";
 
 function ContextProviders({
   application,
@@ -22,9 +20,9 @@ function ContextProviders({
   children: ReactNode;
 }) {
   return (
-    <AuthContextProvider authService={application.auth}>
-      {children}
-    </AuthContextProvider>
+    <AppProvider application={application}>
+      <AuthProvider>{children}</AuthProvider>
+    </AppProvider>
   );
 }
 

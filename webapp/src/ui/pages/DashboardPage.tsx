@@ -1,6 +1,6 @@
-import { PollCard } from "../components/PollCard";
+import { Container } from "../components/Container";
+import { PollCard } from "../components/primitives/PollCard";
 import { useNavigate } from "react-router-dom";
-import { PATHS } from "../router";
 
 type PollId = string;
 
@@ -53,7 +53,7 @@ function Dashboard() {
   const navigate = useNavigate();
 
   function selectPoll(pollId: PollId) {
-    navigate(PATHS.POLL(pollId));
+    navigate("/poll/" + pollId);
   }
 
   return (
@@ -63,8 +63,8 @@ function Dashboard() {
 
 export function DashboardPage() {
   return (
-    <>
+    <Container title="Dashboard">
       <Dashboard />
-    </>
+    </Container>
   );
 }

@@ -1,6 +1,6 @@
 import { Context, createContext, ReactNode, useContext, useState } from "react";
 import { err, ok, Result } from "neverthrow";
-import { AuthService } from "@/domain/services/auth";
+import { useApp } from "./app";
 
 export type LoginParams = {
   username: string;
@@ -27,13 +27,8 @@ export function useAuth(): AuthContextType {
   return auth;
 }
 
-export function AuthContextProvider({
-  authService,
-  children,
-}: {
-  authService: AuthService;
-  children: ReactNode;
-}) {
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const authService = useApp().auth;
   const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 

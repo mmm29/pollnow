@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { TextInput } from "../components/TextInput";
-import { Button } from "../components/Button";
+import { TextInput } from "../components/primitives/TextInput";
+import { Button } from "../components/primitives/Button";
 import { useAuth } from "../hooks/auth";
 import { Error } from "../error";
 import { Navigate } from "react-router-dom";
-import { PATHS } from "../router";
+import { Container } from "../components/Container";
 
 export function LoginPage() {
   const [name, setName] = useState("");
@@ -14,7 +14,7 @@ export function LoginPage() {
   const auth = useAuth();
 
   if (auth.loggedIn) {
-    return <Navigate to={PATHS.HOME} />;
+    return <Navigate to="/" />;
   }
 
   // TODO: disactivate the submit button while the previous submit request is being processed
@@ -38,7 +38,7 @@ export function LoginPage() {
   }
 
   return (
-    <>
+    <Container>
       <div className="h-full w-full flex items-center justify-center mt-32">
         <div className="w-2/5 h-[70%] border px-32 py-32">
           <TextInput
@@ -52,10 +52,10 @@ export function LoginPage() {
             onChange={(password) => setPassword(password)}
           />
           {processing && <p>Processing...</p>}
-          <Button text="Login" onClick={handleSubmit} />
+          <Button onClick={handleSubmit}>Login</Button>
           <Error value={error} />
         </div>
       </div>
-    </>
+    </Container>
   );
 }

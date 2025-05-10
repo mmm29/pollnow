@@ -6,12 +6,7 @@ import { NoPage } from "./pages/NoPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PollPage } from "./pages/PollPage";
-
-export const PATHS = {
-  HOME: "/",
-  LOGIN: "/login",
-  POLL: (pollId: string) => "/poll/" + pollId,
-};
+import { NewPollPage } from "./pages/NewPollPage";
 
 export function BRoutes() {
   return (
@@ -21,6 +16,7 @@ export function BRoutes() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="poll/:pollId" element={<PollPage />} />
+          <Route path="new" element={<NewPollPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="*" element={<NoPage />} />
         </Route>

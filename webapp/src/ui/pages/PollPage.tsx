@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { Container } from "../components/Container";
 
 type ExtendedPollProps = {
   title: string;
@@ -20,5 +21,9 @@ export function PollPage() {
   const title = "Poll title: " + pollId;
   const description = "Poll desc";
 
-  return <ExtendedPoll title={title} description={description} />;
+  return (
+    <Container title="Poll">
+      <ExtendedPoll title={title} description={description} />
+    </Container>
+  );
 }
