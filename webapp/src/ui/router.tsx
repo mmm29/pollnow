@@ -1,35 +1,30 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Layout from "./Layout";
 
-import NoPage from "./pages/NoPage";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
+import { NoPage } from "./pages/NoPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { LoginPage } from "./pages/LoginPage";
+import { PollPage } from "./pages/PollPage";
 
-export function Router() {
+export const PATHS = {
+  HOME: "/",
+  LOGIN: "/login",
+  POLL: (pollId: string) => "/poll/" + pollId,
+};
+
+export function BRoutes() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="*" element={<NoPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="poll/:pollId" element={<PollPage />} />
+          <Route path="login" element={<LoginPage />} />
+          <Route path="*" element={<NoPage />} />
+        </Route>
+      </Routes>
     </>
   );
-}
-
-export function RedirectTo({ route }: { route: string }) {
-  return <Navigate to={route} />;
-}
-
-export function RedirectToHome() {
-  return <RedirectTo route="/" />;
-}
-
-export function RedirectToLogin() {
-  return <RedirectTo route="/login" />;
 }

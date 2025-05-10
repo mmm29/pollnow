@@ -2,10 +2,11 @@ import { useState } from "react";
 import { TextInput } from "../components/TextInput";
 import { Button } from "../components/Button";
 import { useAuth } from "../hooks/auth";
-import { RedirectToHome } from "../router";
 import { Error } from "../error";
+import { Navigate } from "react-router-dom";
+import { PATHS } from "../router";
 
-export default function LoginPage() {
+export function LoginPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const auth = useAuth();
 
   if (auth.loggedIn) {
-    return <RedirectToHome />;
+    return <Navigate to={PATHS.HOME} />;
   }
 
   // TODO: disactivate the submit button while the previous submit request is being processed

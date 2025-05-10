@@ -3,3 +3,7 @@
 @theme {
     --color-secondary: green;
 }
+
+html, body, #root {
+    height: 100%;
+}

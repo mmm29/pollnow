@@ -14,6 +14,7 @@ export interface AuthService {
 export function createAuthService(): AuthService {
   return {
     async getMe(): Promise<User | null> {
+      return null;
       return {
         username: "user123",
       };
