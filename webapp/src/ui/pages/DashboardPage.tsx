@@ -1,4 +1,4 @@
-import { Container } from "../components/Container";
+import { Container } from "../components/primitives/Container";
 import { PollCard } from "../components/primitives/PollCard";
 import { useNavigate } from "react-router-dom";
 

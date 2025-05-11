@@ -4,7 +4,8 @@ import { Button } from "../components/primitives/Button";
 import { useAuth } from "../hooks/auth";
 import { Error } from "../error";
 import { Navigate } from "react-router-dom";
-import { Container } from "../components/Container";
+import { Container } from "../components/primitives/Container";
+import { Field } from "../components/primitives/Field";
 
 export function LoginPage() {
   const [name, setName] = useState("");
@@ -38,21 +39,22 @@ export function LoginPage() {
   }
 
   return (
-    <Container>
-      <div className="h-full w-full flex items-center justify-center mt-32">
-        <div className="w-2/5 h-[70%] border px-32 py-32">
-          <TextInput
-            name="Name"
-            value={name}
-            onChange={(name) => setName(name)}
-          />
-          <TextInput
-            name="Password"
-            value={password}
-            onChange={(password) => setPassword(password)}
-          />
+    <Container title="Login">
+      <div className="h-full w-full flex items-center justify-center mt-8">
+        <div className="w-2/5 h-[70%] border px-32 py-32 rounded-4xl border-gray-300 shadow-md">
+          <Field label="Name">
+            <TextInput value={name} onChange={(name) => setName(name)} />
+          </Field>
+          <Field label="Password">
+            <TextInput
+              value={password}
+              onChange={(password) => setPassword(password)}
+            />
+          </Field>
           {processing && <p>Processing...</p>}
-          <Button onClick={handleSubmit}>Login</Button>
+          <div className="flex justify-end">
+            <Button onClick={handleSubmit}>Login</Button>
+          </div>
           <Error value={error} />
         </div>
       </div>

@@ -1,12 +1,10 @@
-import { Description, Field, Input, Label, Textarea } from "@headlessui/react";
+import { Input, Textarea } from "@headlessui/react";
 import clsx from "clsx";
 import { ChangeEvent } from "react";
 
 type InputChangeHandler = (value: string) => void;
 
 type TextInputProps = {
-  name: string;
-  description?: string;
   placeholder?: string;
   value?: string;
   textarea?: boolean;
@@ -19,8 +17,6 @@ const STYLES = clsx(
 );
 
 export function TextInput({
-  name,
-  description,
   placeholder,
   value,
   textarea,
@@ -36,13 +32,7 @@ export function TextInput({
   }
 
   return (
-    <Field>
-      <Label className="text-sm/6 font-medium text-gray-900">{name}</Label>
-      {description && (
-        <Description className="text-sm/6 text-gray-500">
-          {description}
-        </Description>
-      )}
+    <>
       {textarea ? (
         <Textarea
           className={STYLES}
@@ -59,6 +49,6 @@ export function TextInput({
           onChange={handleChange}
         />
       )}
-    </Field>
+    </>
   );
 }

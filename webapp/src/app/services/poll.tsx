@@ -1,16 +1,16 @@
-import { PollDto } from "@/app/dto";
+import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
-import { PollRepo } from "@/app/repos";
+import { PollRepository } from "@/app/repos";
 
 import { Result } from "neverthrow";
 
 export interface PollService {
-  createPoll(poll: PollDto): Promise<Result<PollId, string>>;
+  createPoll(poll: PollDesc): Promise<Result<PollId, string>>;
 }
 
-export function createPollService(repo: PollRepo): PollService {
+export function createPollService(repo: PollRepository): PollService {
   return {
-    async createPoll(poll: PollDto) {
+    async createPoll(poll: PollDesc) {
       return await repo.createPoll(poll);
     },
   };

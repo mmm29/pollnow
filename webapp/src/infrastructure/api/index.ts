@@ -1,6 +1,6 @@
 import { stringifyError } from "../../utils";
 
-import { PollDto } from "@/app/dto";
+import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
 
 export class ApiClient {
@@ -35,7 +35,7 @@ export class ApiClient {
 
   //
   // Poll
-  async createPoll(poll: PollDto): Promise<ApiResult<PollId>> {
+  async createPoll(poll: PollDesc): Promise<ApiResult<PollId>> {
     return await this._post("/poll", poll);
   }
 

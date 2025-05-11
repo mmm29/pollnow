@@ -1,1 +1,1 @@
-export type { PollDto } from "./poll";
+export type { PollDesc } from "./poll";
