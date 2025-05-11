@@ -1,4 +1,4 @@
-import { stringifyError } from "../utils";
+import { stringifyError } from "../../utils";
 
 import { PollDto } from "@/app/dto";
 import { PollId } from "@/app/models";

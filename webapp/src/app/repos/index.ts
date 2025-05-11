@@ -1,1 +1,1 @@
-export type { PollRepo } from "./poll";
+export type { PollRepository } from "./poll";
