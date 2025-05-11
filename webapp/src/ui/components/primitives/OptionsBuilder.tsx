@@ -1,20 +1,16 @@
-import { ReactNode, useState } from "react";
-import { Button } from "./Button";
 import { TextInput } from "./TextInput";
 import * as Headless from "@headlessui/react";
 import clsx from "clsx";
+import { useState } from "react";
 
 export type PollOption = {
   text: string;
 };
 
 type OptionProps = {
-  editing: boolean;
   option: PollOption;
-  onEdit?: VoidFunction;
   onUpdate?: (value: string) => void;
   onDelete?: VoidFunction;
-  onCancel?: VoidFunction;
 };
 
 export function OptionButton({
@@ -33,29 +29,24 @@ export function OptionButton({
   );
 }
 
-function Option({
-  editing,
-  option,
-  onEdit,
-  onUpdate,
-  onDelete,
-  onCancel,
-}: OptionProps) {
+function Option({ option, onUpdate, onDelete }: OptionProps) {
   // TODO: fix UI
+  const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(option.text);
 
   function handleUpdate() {
     setValue(option.text);
-    if (onUpdate) {
-      onUpdate(value);
-    }
+    onUpdate?.(value);
+    setEditing(false);
   }
 
   function handleCancel() {
     setValue(option.text);
-    if (onCancel) {
-      onCancel();
-    }
+    setEditing(false);
+  }
+
+  function handleEdit() {
+    setEditing(true);
   }
 
   return (
@@ -77,7 +68,7 @@ function Option({
         <>
           <span className="text-sm w-full">{option.text}</span>
           <div className="ml-2">
-            <OptionButton onClick={onEdit}>Edit</OptionButton>
+            <OptionButton onClick={handleEdit}>Edit</OptionButton>
           </div>
           <div className="ml-2">
             <OptionButton onClick={onDelete}>Delete</OptionButton>
@@ -101,36 +92,16 @@ export function OptionsBuilder({
   onDelete,
   onUpdate,
 }: OptionsBuilderProps) {
-  const [editing, setEditing] = useState<string | null>(null);
-  const editingIdx = options.findIndex((opt) => opt.text == editing) ?? null;
-
-  function handleUpdate(idx: number, value: string) {
-    setEditing(null);
-
-    if (onUpdate) {
-      onUpdate(idx, value);
-    }
-  }
-
-  function handleDelete(idx: number) {
-    if (onDelete) {
-      onDelete(idx);
-    }
-  }
-
   return (
     <div className="mt-2">
-      <div className="w-full grid gap-y-4">
+      <div className="w-full grid gap-y-2">
         {options.map((option, idx) => (
           <div>
             <Option
               key={option.text}
-              editing={idx == editingIdx}
               option={option}
-              onEdit={() => setEditing(option.text)}
-              onUpdate={(value) => handleUpdate(idx, value)}
-              onCancel={() => setEditing(null)}
-              onDelete={() => handleDelete(idx)}
+              onUpdate={(value) => onUpdate?.(idx, value)}
+              onDelete={() => onDelete?.(idx)}
             />
           </div>
         ))}

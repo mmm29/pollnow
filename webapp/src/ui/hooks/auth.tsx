@@ -30,7 +30,7 @@ export function useAuth(): AuthContextType {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const authService = useApp().authService;
   const [initialized, setInitialized] = useState(false);
-  const [user, setUser] = useState<string | null>(null);
+  const [user, setUser] = useState<string>();
 
   async function initializeUser() {
     const me = await authService.getMe();

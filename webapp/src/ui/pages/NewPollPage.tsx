@@ -11,6 +11,7 @@ import {
 } from "../components/primitives/OptionsBuilder";
 import { PollDesc } from "@/app/dto";
 import { PollOptionDesc } from "@/app/dto/poll";
+import { useNavigate } from "react-router-dom";
 
 function FormBlock({ children }: { children: ReactNode }) {
   return <div className="border-b border-gray-900/10 pb-12">{children}</div>;
@@ -18,6 +19,7 @@ function FormBlock({ children }: { children: ReactNode }) {
 
 export function NewPollPage() {
   const { pollService } = useApp();
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [options, setOptions] = useState<PollOption[]>([]);
@@ -37,7 +39,13 @@ export function NewPollPage() {
       options: optionsDto,
     };
     const createPollResult = await pollService.createPoll(pollDesc);
-    // TODO: implement
+    if (createPollResult.isErr()) {
+      // TODO: handle error
+      return;
+    }
+
+    const createdPollId = createPollResult.value;
+    navigate("/poll/" + createdPollId);
   }
 
   function handleAddOption() {
