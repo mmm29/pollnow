@@ -28,7 +28,7 @@ export function useAuth(): AuthContextType {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const authService = useApp().auth;
+  const authService = useApp().authService;
   const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<string | null>(null);
 

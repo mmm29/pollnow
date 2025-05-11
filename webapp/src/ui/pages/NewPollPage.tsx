@@ -17,7 +17,7 @@ function FormBlock({ children }: { children: ReactNode }) {
 }
 
 export function NewPollPage() {
-  const app = useApp();
+  const { pollService } = useApp();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [options, setOptions] = useState<PollOption[]>([]);
@@ -36,7 +36,7 @@ export function NewPollPage() {
       description,
       options: optionsDto,
     };
-    const createPollResult = await app.poll.createPoll(pollDesc);
+    const createPollResult = await pollService.createPoll(pollDesc);
     // TODO: implement
   }
 

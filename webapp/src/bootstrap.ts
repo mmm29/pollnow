@@ -11,7 +11,7 @@ export function createApplication(): Application {
   const apiClient = new ApiClient(API_ENDPOINT);
 
   return {
-    auth: createAuthService(new AuthApiImpl(apiClient)),
-    poll: createPollService(new ApiPollRepository(apiClient)),
+    authService: createAuthService(new AuthApiImpl(apiClient)),
+    pollService: createPollService(new ApiPollRepository(apiClient)),
   };
 }

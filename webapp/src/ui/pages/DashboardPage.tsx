@@ -1,17 +1,14 @@
 import { Container } from "../components/primitives/Container";
 import { PollCard } from "../components/primitives/PollCard";
 import { useNavigate } from "react-router-dom";
+import { useApp } from "../hooks/app";
+import { Poll } from "@/app/models";
+import { useEffect, useState } from "react";
 
 type PollId = string;
 
-type PollGridCard = {
-  id: PollId;
-  title: string;
-  description?: string;
-};
-
 type PollGridProps = {
-  cards: PollGridCard[];
+  cards: Poll[];
   onSelect?: (pollId: PollId) => void;
 };
 
@@ -39,26 +36,27 @@ function PollGrid({ cards, onSelect }: PollGridProps) {
 }
 
 function Dashboard() {
-  // TODO: replace
-  const numPollCards = 10;
-  const pollCards = Array.from({ length: numPollCards }, (_, i) => {
-    let v = {
-      id: String(i),
-      title: "Poll " + i,
-      description: "Poll description " + i,
-    };
-    return v;
-  });
-
+  const { pollService } = useApp();
   const navigate = useNavigate();
+
+  const [polls, setPolls] = useState<Poll[]>([]);
+
+  useEffect(() => {
+    pollService.getAllPolls().then((result) => {
+      if (result.isErr()) {
+        // TODO: handle error
+        return;
+      }
+
+      setPolls(result.value);
+    });
+  }, []);
 
   function selectPoll(pollId: PollId) {
     navigate("/poll/" + pollId);
   }
 
-  return (
-    <PollGrid cards={pollCards} onSelect={(pollId) => selectPoll(pollId)} />
-  );
+  return <PollGrid cards={polls} onSelect={(pollId) => selectPoll(pollId)} />;
 }
 
 export function DashboardPage() {
