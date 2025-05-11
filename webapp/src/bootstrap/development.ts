@@ -1,10 +1,10 @@
-import { Application } from "./app";
-import { AuthApi, createAuthService } from "./app/services/auth";
-import { createPollService } from "./app/services/poll";
+import { Application } from "@/app";
+import { AuthApi, createAuthService } from "@/app/services/auth";
+import { createPollService } from "@/app/services/poll";
 import { err, ok, Result } from "neverthrow";
-import { Poll, PollId, User } from "./app/models";
-import { PollRepository } from "./app/repos";
-import { PollDesc } from "./app/dto";
+import { Poll, PollId, User } from "@/app/models";
+import { PollRepository } from "@/app/repos";
+import { PollDesc } from "@/app/dto";
 
 export function createDevApplication(): Application {
   return {

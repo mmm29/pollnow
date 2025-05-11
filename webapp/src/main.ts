@@ -1,4 +1,4 @@
 import { renderUi } from "./ui/main";
-import { createDevApplication } from "./devBootstrap";
+import { createDevApplication } from "./bootstrap/development";
 
 renderUi(createDevApplication());
