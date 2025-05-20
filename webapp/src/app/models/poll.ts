@@ -9,6 +9,6 @@ export type PollOption = {
 export type Poll = {
   id: PollId;
   title: string;
-  description?: string;
+  description: string | null;
   options: PollOption[];
 };

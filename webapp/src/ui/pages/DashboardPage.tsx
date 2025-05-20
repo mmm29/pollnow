@@ -1,5 +1,6 @@
 import { Container } from "../components/primitives/Container";
 import { PollCard } from "../components/primitives/PollCard";
+import { Error } from "../components/primitives/Error";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../hooks/app";
 import { Poll } from "@/app/models";
@@ -26,7 +27,7 @@ function PollGrid({ cards, onSelect }: PollGridProps) {
           <PollCard
             key={card.id}
             title={card.title}
-            description={card.description}
+            description={card.description ?? undefined}
             onClick={() => handleClick(card.id)}
           />
         ))}
@@ -40,11 +41,12 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [polls, setPolls] = useState<Poll[]>([]);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     pollService.getAllPolls().then((result) => {
       if (result.isErr()) {
-        // TODO: handle error
+        setError(result.error);
         return;
       }
 
@@ -54,6 +56,10 @@ function Dashboard() {
 
   function selectPoll(pollId: PollId) {
     navigate("/poll/" + pollId);
+  }
+
+  if (error) {
+    return <Error error={error} />;
   }
 
   return <PollGrid cards={polls} onSelect={(pollId) => selectPoll(pollId)} />;

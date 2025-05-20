@@ -1,9 +1,17 @@
 {
-    "name": "go",
-    "image": "mcr.microsoft.com/devcontainers/go:1.24-bookworm",
+    "name": "pollnow devcontainer",
+    "image": "mcr.microsoft.com/devcontainers/python:3",
     "features": {
         "ghcr.io/devcontainers/features/node:1": {
             "version": "20"
+        }
+    },
+    "postCreateCommand": "./.devcontainer/postCreate.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode"
+            ]
         }
     }
 }

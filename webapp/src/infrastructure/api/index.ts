@@ -2,6 +2,8 @@ import { stringifyError } from "../../utils";
 
 import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
+import { PollOptionResponse, PollResponse } from "./dto";
+import { Result } from "neverthrow";
 
 export class ApiClient {
   endpoint: string;
@@ -36,7 +38,21 @@ export class ApiClient {
   //
   // Poll
   async createPoll(poll: PollDesc): Promise<ApiResult<PollId>> {
-    return await this._post("/poll", poll);
+    type CreatePollresult = {
+      poll_id: string;
+    };
+    return mapResult<CreatePollresult, PollId>(
+      await this._post("/poll", poll),
+      (r) => r.poll_id
+    );
+  }
+
+  async getAllPolls(): Promise<ApiResult<PollResponse[]>> {
+    return await this._get("/poll");
+  }
+
+  async getPollById(pollId: string): Promise<ApiResult<PollResponse>> {
+    return await this._get("/poll/" + pollId);
   }
 
   //
@@ -72,30 +88,40 @@ export class ApiClient {
       };
     }
 
+    // Read body.
+    let data = null;
+    let detail: string = "";
+    let err = null;
+    try {
+      data = await response.json();
+      detail = data.detail;
+    } catch (error) {
+      err = error;
+    }
+
     // Check the response status.
     if (response.status >= 300) {
       return {
         ok: false,
         status: response.status,
-        error_message: response.status.toString(),
+        error_message: detail,
       };
     }
 
     // Parse the response.
-    // The response must always be a valid JSON.
-    try {
-      return {
-        ok: true,
-        status: response.status,
-        data: await response.json(),
-      };
-    } catch (err) {
+    if (err) {
       return {
         ok: false,
         status: 400,
         error_message: stringifyError(err),
       };
     }
+
+    return {
+      ok: true,
+      status: response.status,
+      data,
+    };
   }
 }
 
@@ -113,3 +139,18 @@ export type ApiResult<T> = { status: number } & (
       data: T;
     }
 );
+
+function mapResult<F, T>(
+  obj: ApiResult<F>,
+  mapCallback: (value: F) => T
+): ApiResult<T> {
+  if (!obj.ok) {
+    return obj;
+  }
+
+  return {
+    ok: true,
+    status: obj.status,
+    data: mapCallback(obj.data),
+  };
+}

@@ -3,6 +3,19 @@ import { ApiClient } from "@/infrastructure/api";
 import { PollRepository } from "@/app/repos";
 import { PollDesc } from "@/app/dto";
 import { Poll, PollId } from "@/app/models";
+import { PollResponse } from "../api/dto";
+
+function mapPoll(r: PollResponse): Poll {
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description,
+    options: r.options.map((opt) => ({
+      id: opt.id,
+      text: opt.text,
+    })),
+  };
+}
 
 export class ApiPollRepository implements PollRepository {
   apiClient: ApiClient;
@@ -21,23 +34,24 @@ export class ApiPollRepository implements PollRepository {
   }
 
   async getAll(): Promise<Result<Poll[], string>> {
-    const numPolls = 10;
-    const numOptions = 5;
-    const MOCK_POLLS: Poll[] = Array.from({ length: numPolls }, (_, i) => ({
-      id: String(i),
-      title: "Poll " + i,
-      description: "Poll description " + i,
-      options: Array.from({ length: numOptions }, (_, j) => ({
-        id: String(j),
-        text: "option " + j,
-      })),
-    }));
+    const result = await this.apiClient.getAllPolls();
+    if (!result.ok) {
+      return err(result.error_message);
+    }
 
-    return ok(MOCK_POLLS);
+    const pollResponse = result.data;
+    const polls: Poll[] = pollResponse.map(mapPoll);
+    return ok(polls);
   }
 
   async findPollById(pollId: PollId): Promise<Result<Poll, string>> {
-    return err("not found");
+    const result = await this.apiClient.getPollById(pollId);
+    if (!result.ok) {
+      return err(result.error_message);
+    }
+
+    const poll: Poll = mapPoll(result.data);
+    return ok(poll);
   }
 
   async deletePoll(pollId: PollId): Promise<Result<void, string>> {
