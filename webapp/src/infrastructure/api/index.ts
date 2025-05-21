@@ -3,13 +3,20 @@ import { stringifyError } from "../../utils";
 import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
 import { PollOptionResponse, PollResponse } from "./dto";
-import { Result } from "neverthrow";
+import { UserDto, UserCredentials, AuthResponse } from "./types";
+import { AuthToken } from "@/app/services/auth";
+
+export interface AuthTokenProvider {
+  getAuthToken(): Promise<AuthToken | null>;
+}
 
 export class ApiClient {
   endpoint: string;
+  authTokenProvider: AuthTokenProvider;
 
-  constructor(endpoint: string) {
+  constructor(endpoint: string, authTokenProvider: AuthTokenProvider) {
     this.endpoint = endpoint;
+    this.authTokenProvider = authTokenProvider;
   }
 
   //
@@ -18,21 +25,24 @@ export class ApiClient {
     return await this._get("/me");
   }
 
-  async login(username: string, password: string): Promise<ApiResult<UserDto>> {
-    return await this._post("/login", {
-      username,
-      password,
-    });
+  async login(credentials: UserCredentials): Promise<ApiResult<AuthToken>> {
+    return mapResult<AuthResponse, AuthToken>(
+      await this._post("/login", credentials),
+      (r) => r.token
+    );
   }
 
-  async register(
-    username: string,
-    password: string
-  ): Promise<ApiResult<UserDto>> {
-    return await this._post("/register", {
-      username,
-      password,
-    });
+  async createUser(
+    credentials: UserCredentials
+  ): Promise<ApiResult<AuthToken>> {
+    return mapResult<AuthResponse, AuthToken>(
+      await this._post("/register", credentials),
+      (r) => r.token
+    );
+  }
+
+  async logout(): Promise<ApiResult<void>> {
+    return await this._post("/logout");
   }
 
   //
@@ -70,17 +80,28 @@ export class ApiClient {
     path: string,
     body?: P
   ): Promise<ApiResult<T>> {
-    // Do the request.
-    const response = await fetch(this.endpoint + path, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: body ? JSON.stringify(body) : null,
-    });
+    // Build headers.
+    let headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
 
-    // Check for network failure.
-    if (!response.ok) {
+    const authToken = await this.authTokenProvider.getAuthToken();
+    if (authToken) {
+      headers["Authorization"] = "Bearer " + authToken;
+    }
+
+    const bodyRaw = body ? JSON.stringify(body) : null;
+
+    // Do the request.
+    let response = null;
+
+    try {
+      response = await fetch(this.endpoint + path, {
+        method,
+        headers,
+        body: bodyRaw,
+      });
+    } catch (error) {
       return {
         ok: false,
         status: 502,
@@ -124,10 +145,6 @@ export class ApiClient {
     };
   }
 }
-
-export type UserDto = {
-  username: string;
-};
 
 export type ApiResult<T> = { status: number } & (
   | {

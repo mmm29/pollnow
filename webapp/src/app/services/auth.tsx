@@ -1,36 +1,92 @@
 import { User } from "@/app/models";
-import { Result } from "neverthrow";
+import { err, ok, Result } from "neverthrow";
+
+export type AuthToken = string;
 
 export interface AuthApi {
-  getMe(): Promise<User | null>;
-  login(username: string, password: string): Promise<Result<void, string>>;
-  register(username: string, password: string): Promise<Result<void, string>>;
+  getMe(): Promise<Result<User | null, string>>;
+  login(username: string, password: string): Promise<Result<AuthToken, string>>;
+  register(
+    username: string,
+    password: string
+  ): Promise<Result<AuthToken, string>>;
   logout(): Promise<void>;
 }
 
 export interface AuthService {
-  getMe(): Promise<User | null>;
+  getMe(): Promise<Result<User | null, string>>;
   login(username: string, password: string): Promise<Result<void, string>>;
   register(username: string, password: string): Promise<Result<void, string>>;
   logout(): Promise<void>;
 }
 
-export function createAuthService(authApi: AuthApi): AuthService {
-  return {
-    async getMe(): Promise<User | null> {
-      return await authApi.getMe();
-    },
-    async login(
-      username: string,
-      password: string
-    ): Promise<Result<void, string>> {
-      return await authApi.login(username, password);
-    },
-    async register(username, password): Promise<Result<void, string>> {
-      return await authApi.register(username, password);
-    },
-    async logout() {
-      return await authApi.logout();
-    },
-  };
+export interface TokenStorage {
+  setToken(token: AuthToken): Promise<void>;
+  deleteToken(): Promise<void>;
+}
+
+class AuthServiceImpl implements AuthService {
+  authApi: AuthApi;
+  tokenStorage: TokenStorage;
+
+  constructor(authApi: AuthApi, tokenStorage: TokenStorage) {
+    this.authApi = authApi;
+    this.tokenStorage = tokenStorage;
+  }
+
+  async getMe(): Promise<Result<User | null, string>> {
+    const result = await this.authApi.getMe();
+    if (result.isErr()) {
+      return result;
+    }
+
+    const me = result.value;
+    if (me == null) {
+      await this._deleteToken();
+    }
+
+    return ok(me);
+  }
+
+  async login(
+    username: string,
+    password: string
+  ): Promise<Result<void, string>> {
+    const result = await this.authApi.login(username, password);
+    if (result.isErr()) {
+      return err(result.error);
+    }
+
+    await this.tokenStorage.setToken(result.value);
+    return ok();
+  }
+
+  async register(
+    username: string,
+    password: string
+  ): Promise<Result<void, string>> {
+    const result = await this.authApi.register(username, password);
+    if (result.isErr()) {
+      return err(result.error);
+    }
+
+    await this.tokenStorage.setToken(result.value);
+    return ok();
+  }
+
+  async logout() {
+    await this.authApi.logout();
+    await this._deleteToken();
+  }
+
+  async _deleteToken() {
+    await this.tokenStorage.deleteToken();
+  }
+}
+
+export function createAuthService(
+  authApi: AuthApi,
+  tokenStorage: TokenStorage
+): AuthService {
+  return new AuthServiceImpl(authApi, tokenStorage);
 }

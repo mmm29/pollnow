@@ -2,7 +2,10 @@ from contextlib import contextmanager
 from sqlmodel import create_engine, SQLModel, Session
 
 engine = create_engine("sqlite:///./db.sqlite", echo=True)
-SQLModel.metadata.create_all(engine)
+
+
+def init_db():
+    SQLModel.metadata.create_all(engine)
 
 
 def get_session():

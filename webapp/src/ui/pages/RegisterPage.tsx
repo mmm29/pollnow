@@ -7,7 +7,7 @@ import { Link, Navigate } from "react-router-dom";
 import { Container } from "../components/primitives/Container";
 import { Field } from "../components/primitives/Field";
 
-export function LoginPage() {
+export function RegisterPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -18,15 +18,14 @@ export function LoginPage() {
     return <Navigate to="/" />;
   }
 
-  // TODO: disactivate the submit button while the previous submit request is being processed
-  // maybe also add progress bar or spinning icon
+  // TODO: reuse login page
 
   async function handleSubmit() {
     // TODO: validate params
 
     setProcessing(true);
 
-    const loginResult = await auth.loginAction({
+    const loginResult = await auth.registerAction({
       username: name,
       password,
     });
@@ -53,10 +52,10 @@ export function LoginPage() {
           </Field>
           {processing && <p>Processing...</p>}
           <div className="flex justify-end">
-            <Button onClick={handleSubmit}>Login</Button>
+            <Button onClick={handleSubmit}>Register</Button>
           </div>
           <div className="flex justify-end">
-            <Link to="/register">Don't have an account? Register</Link>
+            <Link to="/login">Already have an account? Login</Link>
           </div>
           <Error value={error} />
         </div>

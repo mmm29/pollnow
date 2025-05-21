@@ -7,10 +7,17 @@ export type LoginParams = {
   password: string;
 };
 
+export type RegisterParams = {
+  username: string;
+  password: string;
+};
+
 export type AuthContextType = {
   loggedIn: boolean;
   username: string;
   loginAction: (params: LoginParams) => Promise<Result<void, string>>;
+  registerAction: (params: RegisterParams) => Promise<Result<void, string>>;
+  logoutAction: () => Promise<Result<void, string>>;
 };
 
 const AuthContext: Context<AuthContextType | null> = createContext(null as any);
@@ -32,19 +39,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<string>();
 
-  async function initializeUser() {
-    const me = await authService.getMe();
+  async function reinitializeUser(): Promise<Result<void, string>> {
+    const result = await authService.getMe();
+
     setInitialized(true);
 
+    if (result.isErr()) {
+      return err(result.error);
+    }
+
+    const me = result.value;
     if (me == null) {
-      return;
+      return ok();
     }
 
     setUser(me.username);
+    return ok();
   }
 
   async function loginAction(params: LoginParams) {
-    // Login
     const loginResult = await authService.login(
       params.username,
       params.password
@@ -54,17 +67,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return err(loginResult.error);
     }
 
-    // Get me
-    const me = await authService.getMe();
-    if (me == null) {
-      return err("logged in, but no user");
-    }
-
-    setUser(me.username);
-    return ok();
+    return await reinitializeUser();
   }
 
-  initializeUser();
+  async function registerAction(params: RegisterParams) {
+    const registerResult = await authService.register(
+      params.username,
+      params.password
+    );
+
+    if (registerResult.isErr()) {
+      return err(registerResult.error);
+    }
+
+    return await reinitializeUser();
+  }
+
+  async function logoutAction() {
+    await authService.logout();
+    return await reinitializeUser();
+  }
+
+  reinitializeUser();
 
   if (!initialized) {
     return <>{children}</>;
@@ -74,6 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loggedIn: user != null,
     username: user ? user : "",
     loginAction,
+    registerAction,
+    logoutAction,
   };
 
   return (
