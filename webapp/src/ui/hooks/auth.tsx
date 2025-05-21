@@ -13,6 +13,7 @@ export type RegisterParams = {
 };
 
 export type AuthContextType = {
+  initialized: boolean;
   loggedIn: boolean;
   username: string;
   loginAction: (params: LoginParams) => Promise<Result<void, string>>;
@@ -23,7 +24,8 @@ export type AuthContextType = {
 const AuthContext: Context<AuthContextType | null> = createContext(null as any);
 
 export function isInitialized() {
-  return useContext(AuthContext) !== null;
+  const auth = useAuth();
+  return auth.initialized;
 }
 
 export function useAuth(): AuthContextType {
@@ -90,11 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   reinitializeUser();
 
-  if (!initialized) {
-    return <>{children}</>;
-  }
-
   const authContext: AuthContextType = {
+    initialized,
     loggedIn: user != null,
     username: user ? user : "",
     loginAction,

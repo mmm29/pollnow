@@ -36,7 +36,7 @@ function PollGrid({ cards, onSelect }: PollGridProps) {
   );
 }
 
-function Dashboard() {
+function Board() {
   const { pollService } = useApp();
   const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ function Dashboard() {
   const [error, setError] = useState<string>();
 
   async function reload() {
-    const result = await pollService.getAllPolls();
+    const result = await pollService.getMyPolls();
 
     setLoaded(true);
 
@@ -76,10 +76,10 @@ function Dashboard() {
   return <PollGrid cards={polls} onSelect={(pollId) => selectPoll(pollId)} />;
 }
 
-export function DashboardPage() {
+export function MyPollsPage() {
   return (
-    <Container title="Dashboard">
-      <Dashboard />
+    <Container title="My polls">
+      <Board />
     </Container>
   );
 }

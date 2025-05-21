@@ -8,6 +8,7 @@ import { AppError } from "../error";
 export interface PollService {
   createPoll(poll: PollDesc): Promise<Result<PollId, AppError>>;
   getAllPolls(): Promise<Result<Poll[], AppError>>;
+  getMyPolls(): Promise<Result<Poll[], AppError>>;
   findPollById(pollId: PollId): Promise<Result<Poll, AppError>>;
   completePoll(
     pollId: PollId,

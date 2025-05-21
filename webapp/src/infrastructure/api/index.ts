@@ -75,7 +75,11 @@ export class ApiClient {
   }
 
   async getAllPolls(): Promise<ApiResult<PollResponse[]>> {
-    return await this._get("/poll");
+    return await this._get("/poll", { select: "all" });
+  }
+
+  async getMyPolls(): Promise<ApiResult<PollResponse[]>> {
+    return await this._get("/poll", { select: "my" });
   }
 
   async getPollById(pollId: string): Promise<ApiResult<PollResponse>> {
@@ -95,8 +99,11 @@ export class ApiClient {
 
   //
   // Service
-  async _get<T>(path: string): Promise<ApiResult<T>> {
-    return await this._request("GET", path, null);
+  async _get<T>(path: string, params?: GetParams): Promise<ApiResult<T>> {
+    const queryString = params ? toQueryString(params) : "";
+    const pathWithParams =
+      path + (queryString.length > 0 ? "?" + queryString : "");
+    return await this._request("GET", pathWithParams, null);
   }
 
   async _post<T, P>(path: string, body?: P): Promise<ApiResult<T>> {
@@ -183,6 +190,18 @@ export class ApiClient {
       data,
     };
   }
+}
+
+type GetParams = Record<string, string | number | boolean | undefined>;
+
+function toQueryString(params: GetParams): string {
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value != null) {
+      qs.set(key, String(value));
+    }
+  }
+  return qs.toString();
 }
 
 export type ApiResult<T> = { status: number } & (

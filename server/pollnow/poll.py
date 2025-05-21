@@ -1,5 +1,5 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends
+from typing import List, Optional, Literal
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlmodel import select, delete
 
@@ -81,8 +81,17 @@ async def get_poll_by_id(poll_id: int, session: Session = Depends(get_session), 
 
 
 @router.get("/poll", response_model=List[PollResponse])
-async def get_all_polls(session: Session = Depends(get_session), user: Optional[User] = Depends(get_session_user)):
-    polls = session.exec(select(Poll)).all()
+async def get_polls(select_filter: Literal["all", "my"] = Query(alias='select'),
+                    session: Session = Depends(get_session),
+                    user: Optional[User] = Depends(get_session_user)):
+    if select_filter == 'all':
+        query = select(Poll)
+    elif select_filter == 'my':
+        query = select(Poll).where(Poll.creator_id == user.id)
+    else:
+        raise ValidationError('invalid param value')
+
+    polls = session.exec(query).all()
     return list(map(lambda poll: map_poll_to_response(poll, user, session), polls))
 
 

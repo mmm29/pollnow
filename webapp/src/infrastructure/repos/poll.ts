@@ -48,6 +48,17 @@ export class PollApi implements PollService {
     return ok(polls);
   }
 
+  async getMyPolls(): Promise<Result<Poll[], AppError>> {
+    const result = await this.apiClient.getMyPolls();
+    if (!result.ok) {
+      return err(result.error_message);
+    }
+
+    const pollResponse = result.data;
+    const polls: Poll[] = pollResponse.map(mapPoll);
+    return ok(polls);
+  }
+
   async findPollById(pollId: PollId): Promise<Result<Poll, AppError>> {
     const result = await this.apiClient.getPollById(pollId);
     if (!result.ok) {

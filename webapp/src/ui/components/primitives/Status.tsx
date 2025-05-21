@@ -31,11 +31,11 @@ type StatusVariation = {
 const variations: Record<StatusKind, StatusVariation> = {
   error: {
     text: "Error",
-    styles: "",
+    styles: "font-semibold text-red-800",
   },
   success: {
     text: "Success",
-    styles: "",
+    styles: "font-semibold text-green-800",
   },
 };
 
