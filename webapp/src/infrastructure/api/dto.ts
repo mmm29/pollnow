@@ -9,3 +9,8 @@ export type PollResponse = {
   description: string | null;
   options: PollOptionResponse[];
 };
+
+export type ChangePasswordRequest = {
+  old_password: string;
+  new_password: string;
+};

@@ -5,6 +5,7 @@ import { createPollService } from "@/app/services/poll";
 import { AuthApiImpl } from "@/infrastructure/api/auth";
 import { ApiPollRepository } from "@/infrastructure/repos/poll";
 import { TokenLocalStorage } from "@/infrastructure/tokenStorage";
+import { SettingsApi } from "@/infrastructure/api/settings";
 
 const API_ENDPOINT = "http://localhost:8000";
 
@@ -15,5 +16,6 @@ export function createProdApplication(): Application {
   return {
     authService: createAuthService(new AuthApiImpl(apiClient), tokenStorage),
     pollService: createPollService(new ApiPollRepository(apiClient)),
+    settingsService: new SettingsApi(apiClient),
   };
 }

@@ -1,6 +1,6 @@
 import { Container } from "../components/primitives/Container";
 import { PollCard } from "../components/primitives/PollCard";
-import { Error } from "../components/primitives/Error";
+import { ErrorStatus } from "../components/primitives/Status";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../hooks/app";
 import { Poll } from "@/app/models";
@@ -59,7 +59,7 @@ function Dashboard() {
   }
 
   if (error) {
-    return <Error error={error} />;
+    return <ErrorStatus error={error} />;
   }
 
   return <PollGrid cards={polls} onSelect={(pollId) => selectPoll(pollId)} />;

@@ -12,10 +12,7 @@ import {
 import { PollDesc } from "@/app/dto";
 import { PollOptionDesc } from "@/app/dto/poll";
 import { useNavigate } from "react-router-dom";
-
-function FormBlock({ children }: { children: ReactNode }) {
-  return <div className="border-b border-gray-900/10 pb-12">{children}</div>;
-}
+import { Section } from "../components/primitives/Section";
 
 export function NewPollPage() {
   const { pollService } = useApp();
@@ -65,7 +62,7 @@ export function NewPollPage() {
   return (
     <Container title="New poll">
       <form onSubmit={handleSubmit}>
-        <FormBlock>
+        <Section>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8">
             <Field label="Title" description="Give the poll a title">
               <TextInput value={title} onChange={(val) => setTitle(val)} />
@@ -88,7 +85,7 @@ export function NewPollPage() {
               />
             </Field>
           </div>
-        </FormBlock>
+        </Section>
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <Button type="submit">

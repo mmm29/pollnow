@@ -2,16 +2,16 @@ import { useState } from "react";
 import { TextInput } from "../components/primitives/TextInput";
 import { Button } from "../components/primitives/Button";
 import { useAuth } from "../hooks/auth";
-import { Error } from "../error";
 import { Link, Navigate } from "react-router-dom";
 import { Container } from "../components/primitives/Container";
 import { Field } from "../components/primitives/Field";
+import { ErrorStatus } from "../components/primitives/Status";
 
 export function LoginPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>();
   const auth = useAuth();
 
   if (auth.loggedIn) {
@@ -58,7 +58,7 @@ export function LoginPage() {
           <div className="flex justify-end">
             <Link to="/register">Don't have an account? Register</Link>
           </div>
-          <Error value={error} />
+          <ErrorStatus error={error} />
         </div>
       </div>
     </Container>

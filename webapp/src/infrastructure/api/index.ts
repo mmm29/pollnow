@@ -2,7 +2,7 @@ import { stringifyError } from "../../utils";
 
 import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
-import { PollOptionResponse, PollResponse } from "./dto";
+import { ChangePasswordRequest, PollOptionResponse, PollResponse } from "./dto";
 import { UserDto, UserCredentials, AuthResponse } from "./types";
 import { AuthToken } from "@/app/services/auth";
 
@@ -46,6 +46,14 @@ export class ApiClient {
   }
 
   //
+  // Settings
+  async changePassword(
+    request: ChangePasswordRequest
+  ): Promise<ApiResult<void>> {
+    return await this._put("/password", request);
+  }
+
+  //
   // Poll
   async createPoll(poll: PollDesc): Promise<ApiResult<PollId>> {
     type CreatePollresult = {
@@ -73,6 +81,10 @@ export class ApiClient {
 
   async _post<T, P>(path: string, body?: P): Promise<ApiResult<T>> {
     return await this._request("POST", path, body);
+  }
+
+  async _put<T, P>(path: string, body?: P): Promise<ApiResult<T>> {
+    return await this._request("PUT", path, body);
   }
 
   async _request<T, P>(
@@ -109,16 +121,19 @@ export class ApiClient {
       };
     }
 
-    // Read body.
+    // Read the body.
     let data = null;
     let detail: string = "";
     let err = null;
     try {
       data = await response.json();
-      detail = data.detail;
     } catch (error) {
       err = error;
     }
+
+    try {
+      detail = data.detail;
+    } catch (error) {}
 
     // Check the response status.
     if (response.status >= 300) {
