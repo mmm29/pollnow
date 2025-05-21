@@ -14,3 +14,9 @@ class Poll(SQLModel, table=True):
     title: str
     description: Optional[str]
     options: List["PollOption"] = Relationship(back_populates='poll')
+
+
+class User(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(unique=True)
+    password: str
