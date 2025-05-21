@@ -2,7 +2,7 @@ import { Application } from "@/app";
 import { ApiClient } from "@/infrastructure/api";
 import { createAuthService } from "@/app/services/auth";
 import { AuthApiImpl } from "@/infrastructure/api/auth";
-import { PollApi } from "@/infrastructure/repos/poll";
+import { PollApi } from "@/infrastructure/api/poll";
 import { TokenLocalStorage } from "@/infrastructure/tokenStorage";
 import { SettingsApi } from "@/infrastructure/api/settings";
 

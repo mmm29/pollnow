@@ -9,6 +9,7 @@ export interface PollService {
   createPoll(poll: PollDesc): Promise<Result<PollId, AppError>>;
   getAllPolls(): Promise<Result<Poll[], AppError>>;
   getMyPolls(): Promise<Result<Poll[], AppError>>;
+  deletePoll(pollId: PollId): Promise<Result<void, AppError>>;
   findPollById(pollId: PollId): Promise<Result<Poll, AppError>>;
   completePoll(
     pollId: PollId,

@@ -9,6 +9,7 @@ export type PollResponse = {
   title: string;
   description: string | null;
   completed: boolean;
+  can_edit: boolean;
   options: PollOptionResponse[];
 };
 

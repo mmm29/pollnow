@@ -6,10 +6,14 @@ from sqlmodel import select, delete
 from .dto import PollCompletionRequest, PollForm, PollResponse, PollOptionResponse
 from .models import Poll, PollCompletion, PollOption, User
 from .store import get_session, Session
-from .errors import ResourceNotFound, ValidationError
+from .errors import InsufficientPermissions, ResourceNotFound, ValidationError
 from .auth import get_session_user, require_user
 
 router = APIRouter()
+
+
+def can_user_edit_poll(user: User, poll: Poll) -> bool:
+    return poll.creator_id == user.id
 
 
 class CreatePollResponse(BaseModel):
@@ -23,6 +27,8 @@ def map_poll_to_response(poll: Poll, user: Optional[User], session: Session) -> 
             PollCompletion.poll_id == poll.id, PollCompletion.user_id == user.id)).one_or_none()
         if completion is not None:
             selected_option_id = completion.option_id
+
+    can_edit = can_user_edit_poll(user, poll) if user else False
 
     options = [
         PollOptionResponse(
@@ -38,7 +44,8 @@ def map_poll_to_response(poll: Poll, user: Optional[User], session: Session) -> 
         title=poll.title,
         description=poll.description,
         completed=selected_option_id is not None,
-        options=options
+        options=options,
+        can_edit=can_edit
     )
 
 
@@ -68,15 +75,27 @@ async def create_poll(poll_form: PollForm, session: Session = Depends(get_sessio
     return CreatePollResponse(poll_id=str(poll.id))
 
 
-@router.get("/poll/{poll_id}", response_model=PollResponse)
-async def get_poll_by_id(poll_id: int, session: Session = Depends(get_session), user: Optional[User] = Depends(get_session_user)):
-    poll = session.exec(select(Poll).where(
-        Poll.id == poll_id
-    )).one_or_none()
-
+def find_poll_by_id(session: Session, poll_id: int) -> Poll:
+    poll = session.exec(select(Poll).where(Poll.id == poll_id)).one_or_none()
     if poll is None:
         raise ResourceNotFound()
 
+    return poll
+
+
+@router.delete('/poll/{poll_id}')
+async def delete_poll(poll_id: int, session: Session = Depends(get_session), user: Optional[User] = Depends(require_user)):
+    poll = find_poll_by_id(session, poll_id)
+    if not can_user_edit_poll(user, poll):
+        raise InsufficientPermissions()
+
+    session.exec(delete(Poll).where(Poll.id == poll_id))
+    session.commit()
+
+
+@router.get("/poll/{poll_id}", response_model=PollResponse)
+async def get_poll_by_id(poll_id: int, session: Session = Depends(get_session), user: Optional[User] = Depends(get_session_user)):
+    poll = find_poll_by_id(session, poll_id)
     return map_poll_to_response(poll, user, session)
 
 
@@ -112,9 +131,7 @@ async def complete_poll(poll_id: int, request: PollCompletionRequest, session: S
         PollCompletion.poll_id == poll_id, PollCompletion.user_id == user.id))
 
     # Find poll by id
-    poll = session.exec(select(Poll).where(Poll.id == poll_id)).one_or_none()
-    if poll is None:
-        raise ResourceNotFound('Poll not found')
+    poll = find_poll_by_id(session, poll_id)
 
     # Check if such option exists
     option = session.exec(select(PollOption).where(

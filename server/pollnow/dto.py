@@ -23,6 +23,7 @@ class PollResponse(BaseModel):
     title: str
     description: Optional[str]
     completed: bool
+    can_edit: bool
     options: List[PollOptionResponse]
 
 

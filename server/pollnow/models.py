@@ -15,7 +15,7 @@ class User(SQLModel, table=True):
 class PollOption(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     text: str
-    poll_id: int = Field(foreign_key='poll.id')
+    poll_id: int = Field(foreign_key='poll.id', ondelete='CASCADE')
     poll: "Poll" = Relationship(back_populates='options')
 
 
@@ -33,10 +33,10 @@ class Poll(SQLModel, table=True):
 class PollCompletion(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
-    user_id: int = Field(foreign_key='user.id')
-    poll_id: int = Field(foreign_key='poll.id')
-    option_id: int = Field(foreign_key='polloption.id')
+    user_id: Optional[int] = Field(foreign_key='user.id')
+    poll_id: int = Field(foreign_key='poll.id', ondelete='CASCADE')
+    option_id: int = Field(foreign_key='polloption.id', ondelete='CASCADE')
 
-    user: "User" = Relationship(back_populates='poll_completions')
+    user: Optional["User"] = Relationship(back_populates='poll_completions')
     poll: "Poll" = Relationship(back_populates='completions')
     option: "PollOption" = Relationship()

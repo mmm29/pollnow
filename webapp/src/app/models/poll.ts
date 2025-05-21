@@ -15,6 +15,7 @@ export type Poll = {
   id: PollId;
   title: string;
   completed: boolean;
+  canEdit: boolean;
   description: string | null;
   options: PollOption[];
 };

@@ -24,3 +24,8 @@ class AlreadyExists(HTTPException):
 class ValidationError(HTTPException):
     def __init__(self, detail: str = 'Validation failed'):
         super().__init__(status_code=400, detail=detail)
+
+
+class InsufficientPermissions(HTTPException):
+    def __init__(self, detail: str = 'Insufficient permissions'):
+        super().__init__(status_code=403, detail=detail)

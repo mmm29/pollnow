@@ -1,4 +1,4 @@
-import { useParams, useRouteLoaderData } from "react-router-dom";
+import { useNavigate, useParams, useRouteLoaderData } from "react-router-dom";
 import { Container } from "../components/primitives/Container";
 import { useApp } from "../hooks/app";
 import { FormEvent, useEffect, useState } from "react";
@@ -106,6 +106,34 @@ function CompletedPoll({ poll, reload }: CompletedPollProps) {
   );
 }
 
+function PollEdit({ poll }: { poll: Poll }) {
+  const { pollService } = useApp();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState<StatusType>();
+
+  async function onDelete() {
+    setStatus(undefined);
+
+    const result = await pollService.deletePoll(poll.id);
+    if (result.isErr()) {
+      setStatus(makeErrorStatus(result.error));
+      return;
+    }
+
+    navigate("/dashboard");
+  }
+
+  return (
+    <div>
+      <Status status={status} />
+
+      <Button variant="soft" onClick={onDelete}>
+        Delete
+      </Button>
+    </div>
+  );
+}
+
 function PageContent() {
   const { pollId } = useParams();
   const { pollService } = useApp();
@@ -156,6 +184,7 @@ function PageContent() {
       ) : (
         <UncompletedPoll poll={poll} reload={reload} />
       )}
+      {poll.canEdit && <PollEdit poll={poll} />}
     </>
   );
 }

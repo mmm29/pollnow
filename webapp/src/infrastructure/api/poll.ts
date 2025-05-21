@@ -2,7 +2,7 @@ import { err, ok, Result } from "neverthrow";
 import { ApiClient } from "@/infrastructure/api";
 import { PollDesc } from "@/app/dto";
 import { Poll, PollId } from "@/app/models";
-import { PollResponse } from "../api/dto";
+import { PollResponse } from "./dto";
 import { PollService } from "@/app/services/poll";
 import { PollCompletion } from "@/app/models/poll";
 import { AppError } from "@/app/error";
@@ -13,6 +13,7 @@ function mapPoll(r: PollResponse): Poll {
     title: r.title,
     description: r.description,
     completed: r.completed,
+    canEdit: r.can_edit,
     options: r.options.map((opt) => ({
       id: opt.id,
       text: opt.text,
