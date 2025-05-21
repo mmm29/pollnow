@@ -2,7 +2,12 @@ import { stringifyError } from "../../utils";
 
 import { PollDesc } from "@/app/dto";
 import { PollId } from "@/app/models";
-import { ChangePasswordRequest, PollOptionResponse, PollResponse } from "./dto";
+import {
+  ChangePasswordRequest,
+  PollCompletion,
+  PollOptionResponse,
+  PollResponse,
+} from "./dto";
 import { UserDto, UserCredentials, AuthResponse } from "./types";
 import { AuthToken } from "@/app/services/auth";
 
@@ -65,12 +70,27 @@ export class ApiClient {
     );
   }
 
+  async deletePoll(pollId: string): Promise<ApiResult<void>> {
+    return this._delete("/poll/" + pollId);
+  }
+
   async getAllPolls(): Promise<ApiResult<PollResponse[]>> {
     return await this._get("/poll");
   }
 
   async getPollById(pollId: string): Promise<ApiResult<PollResponse>> {
     return await this._get("/poll/" + pollId);
+  }
+
+  async completePoll(
+    pollId: string,
+    completion: PollCompletion
+  ): Promise<ApiResult<void>> {
+    return await this._post("/poll/" + pollId + "/completion", completion);
+  }
+
+  async uncompletePoll(pollId: string): Promise<ApiResult<void>> {
+    return await this._delete("/poll/" + pollId + "/completion");
   }
 
   //
@@ -85,6 +105,10 @@ export class ApiClient {
 
   async _put<T, P>(path: string, body?: P): Promise<ApiResult<T>> {
     return await this._request("PUT", path, body);
+  }
+
+  async _delete<T, P>(path: string): Promise<ApiResult<T>> {
+    return await this._request("DELETE", path, null);
   }
 
   async _request<T, P>(

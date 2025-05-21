@@ -1,13 +1,19 @@
 export type PollOptionResponse = {
   id: string;
   text: string;
+  selected: boolean;
 };
 
 export type PollResponse = {
   id: string;
   title: string;
   description: string | null;
+  completed: boolean;
   options: PollOptionResponse[];
+};
+
+export type PollCompletion = {
+  option_id: string;
 };
 
 export type ChangePasswordRequest = {

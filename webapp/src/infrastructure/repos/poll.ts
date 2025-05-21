@@ -1,23 +1,26 @@
 import { err, ok, Result } from "neverthrow";
 import { ApiClient } from "@/infrastructure/api";
-import { PollRepository } from "@/app/repos";
 import { PollDesc } from "@/app/dto";
 import { Poll, PollId } from "@/app/models";
 import { PollResponse } from "../api/dto";
+import { PollService } from "@/app/services/poll";
+import { PollCompletion } from "@/app/models/poll";
 
 function mapPoll(r: PollResponse): Poll {
   return {
     id: r.id,
     title: r.title,
     description: r.description,
+    completed: r.completed,
     options: r.options.map((opt) => ({
       id: opt.id,
       text: opt.text,
+      selected: opt.selected,
     })),
   };
 }
 
-export class ApiPollRepository implements PollRepository {
+export class PollApi implements PollService {
   apiClient: ApiClient;
 
   constructor(apiClient: ApiClient) {
@@ -33,7 +36,7 @@ export class ApiPollRepository implements PollRepository {
     return ok(result.data);
   }
 
-  async getAll(): Promise<Result<Poll[], string>> {
+  async getAllPolls(): Promise<Result<Poll[], string>> {
     const result = await this.apiClient.getAllPolls();
     if (!result.ok) {
       return err(result.error_message);
@@ -55,6 +58,36 @@ export class ApiPollRepository implements PollRepository {
   }
 
   async deletePoll(pollId: PollId): Promise<Result<void, string>> {
-    return err("not found");
+    const result = await this.apiClient.deletePoll(pollId);
+    if (!result.ok) {
+      return err(result.error_message);
+    }
+
+    return ok();
+  }
+
+  async completePoll(
+    pollId: PollId,
+    completion: PollCompletion
+  ): Promise<Result<void, string>> {
+    const result = await this.apiClient.completePoll(pollId, {
+      option_id: completion.option_id,
+    });
+
+    if (!result.ok) {
+      return err(result.error_message);
+    }
+
+    return ok();
+  }
+
+  async uncompletePoll(pollId: PollId): Promise<Result<void, string>> {
+    const result = await this.apiClient.uncompletePoll(pollId);
+
+    if (!result.ok) {
+      return err(result.error_message);
+    }
+
+    return ok();
   }
 }
