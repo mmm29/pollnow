@@ -6,10 +6,13 @@ export function LogoutPage() {
   const auth = useAuth();
   const navigate = useNavigate();
 
+  async function logout() {
+    await auth.logoutAction();
+    navigate("/");
+  }
+
   useEffect(() => {
-    auth.logoutAction().then(() => {
-      navigate("/");
-    });
+    logout();
   }, []);
 
   return <></>;

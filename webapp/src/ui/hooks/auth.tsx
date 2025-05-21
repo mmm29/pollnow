@@ -1,4 +1,11 @@
-import { Context, createContext, ReactNode, useContext, useState } from "react";
+import {
+  Context,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { err, ok, Result } from "neverthrow";
 import { useApp } from "./app";
 
@@ -18,7 +25,7 @@ export type AuthContextType = {
   username: string;
   loginAction: (params: LoginParams) => Promise<Result<void, string>>;
   registerAction: (params: RegisterParams) => Promise<Result<void, string>>;
-  logoutAction: () => Promise<Result<void, string>>;
+  logoutAction: () => Promise<void>;
 };
 
 const AuthContext: Context<AuthContextType | null> = createContext(null as any);
@@ -37,11 +44,14 @@ export function useAuth(): AuthContextType {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const authService = useApp().authService;
+  const { authService } = useApp();
   const [initialized, setInitialized] = useState(false);
   const [user, setUser] = useState<string>();
 
   async function reinitializeUser(): Promise<Result<void, string>> {
+    setUser(undefined);
+    setInitialized(false);
+
     const result = await authService.getMe();
 
     setInitialized(true);
@@ -87,10 +97,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function logoutAction() {
     await authService.logout();
-    return await reinitializeUser();
+    reinitializeUser();
   }
 
-  reinitializeUser();
+  useEffect(() => {
+    reinitializeUser();
+  }, []);
 
   const authContext: AuthContextType = {
     initialized,

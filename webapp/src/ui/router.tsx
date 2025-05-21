@@ -4,10 +4,9 @@ import Layout from "./Layout";
 
 import { NoPage } from "./pages/NoPage";
 import { DashboardPage } from "./pages/DashboardPage";
-import { LoginPage } from "./pages/LoginPage";
+import { LoginPage, RegisterPage } from "./pages/LoginPage";
 import { PollPage } from "./pages/PollPage";
 import { NewPollPage } from "./pages/NewPollPage";
-import { RegisterPage } from "./pages/RegisterPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { MyPollsPage } from "./pages/MyPollsPage";

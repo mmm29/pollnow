@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { TextInput } from "../components/primitives/TextInput";
 import { Button } from "../components/primitives/Button";
 import { useAuth } from "../hooks/auth";
@@ -7,16 +7,31 @@ import { Container } from "../components/primitives/Container";
 import { Field } from "../components/primitives/Field";
 import { ErrorStatus } from "../components/primitives/Status";
 
+export type LoginPageCoreProps = {
+  title: string;
+  children?: ReactNode;
+};
+
+function LoginPageContainer({ title, children }: LoginPageCoreProps) {
+  const auth = useAuth();
+
+  if (auth.loggedIn) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <Container title={title}>
+      <div className="md:w-[40vh] md:mt-8 m-auto">{children}</div>
+    </Container>
+  );
+}
+
 export function LoginPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string>();
   const auth = useAuth();
-
-  if (auth.loggedIn) {
-    return <Navigate to="/" />;
-  }
 
   // TODO: disactivate the submit button while the previous submit request is being processed
   // maybe also add progress bar or spinning icon
@@ -26,41 +41,87 @@ export function LoginPage() {
 
     setProcessing(true);
 
-    const loginResult = await auth.loginAction({
+    const result = await auth.loginAction({
       username: name,
       password,
     });
 
     setProcessing(false);
 
-    if (loginResult.isErr()) {
-      setError(loginResult.error);
+    if (result.isErr()) {
+      setError(result.error);
     }
   }
 
   return (
-    <Container title="Login">
-      <div className="h-full w-full flex items-center justify-center mt-8">
-        <div className="w-2/5 h-[70%] border px-32 py-32 rounded-4xl border-gray-300 shadow-md">
-          <Field label="Name">
-            <TextInput value={name} onChange={(name) => setName(name)} />
-          </Field>
-          <Field label="Password">
-            <TextInput
-              value={password}
-              onChange={(password) => setPassword(password)}
-            />
-          </Field>
-          {processing && <p>Processing...</p>}
-          <div className="flex justify-end">
-            <Button onClick={handleSubmit}>Login</Button>
-          </div>
-          <div className="flex justify-end">
-            <Link to="/register">Don't have an account? Register</Link>
-          </div>
-          <ErrorStatus error={error} />
-        </div>
+    <LoginPageContainer title="Login">
+      <Field label="Name">
+        <TextInput value={name} onChange={(name) => setName(name)} />
+      </Field>
+      <Field label="Password">
+        <TextInput
+          value={password}
+          onChange={(password) => setPassword(password)}
+        />
+      </Field>
+      {processing && <p>Processing...</p>}
+      <div className="flex justify-end mt-4">
+        <Button onClick={handleSubmit}>Login</Button>
       </div>
-    </Container>
+      <div className="flex justify-end mt-4">
+        <Link to="/register">Don't have an account? Register</Link>
+      </div>
+      <ErrorStatus error={error} />
+    </LoginPageContainer>
+  );
+}
+
+export function RegisterPage() {
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string>();
+  const auth = useAuth();
+
+  // TODO: disactivate the submit button while the previous submit request is being processed
+  // maybe also add progress bar or spinning icon
+
+  async function handleSubmit() {
+    // TODO: validate params
+
+    setProcessing(true);
+
+    const result = await auth.registerAction({
+      username: name,
+      password,
+    });
+
+    setProcessing(false);
+
+    if (result.isErr()) {
+      setError(result.error);
+    }
+  }
+
+  return (
+    <LoginPageContainer title="Register">
+      <Field label="Name">
+        <TextInput value={name} onChange={(name) => setName(name)} />
+      </Field>
+      <Field label="Password">
+        <TextInput
+          value={password}
+          onChange={(password) => setPassword(password)}
+        />
+      </Field>
+      {processing && <p>Processing...</p>}
+      <div className="flex justify-end mt-4">
+        <Button onClick={handleSubmit}>Register</Button>
+      </div>
+      <div className="flex justify-end mt-4">
+        <Link to="/login">Already have an account? Login</Link>
+      </div>
+      <ErrorStatus error={error} />
+    </LoginPageContainer>
   );
 }
