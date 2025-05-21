@@ -3,14 +3,15 @@ import { Poll, PollId } from "@/app/models";
 
 import { Result } from "neverthrow";
 import { PollCompletion } from "../models/poll";
+import { AppError } from "../error";
 
 export interface PollService {
-  createPoll(poll: PollDesc): Promise<Result<PollId, string>>;
-  getAllPolls(): Promise<Result<Poll[], string>>;
-  findPollById(pollId: PollId): Promise<Result<Poll, string>>;
+  createPoll(poll: PollDesc): Promise<Result<PollId, AppError>>;
+  getAllPolls(): Promise<Result<Poll[], AppError>>;
+  findPollById(pollId: PollId): Promise<Result<Poll, AppError>>;
   completePoll(
     pollId: PollId,
     completion: PollCompletion
-  ): Promise<Result<void, string>>;
-  uncompletePoll(pollId: PollId): Promise<Result<void, string>>;
+  ): Promise<Result<void, AppError>>;
+  uncompletePoll(pollId: PollId): Promise<Result<void, AppError>>;
 }

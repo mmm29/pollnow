@@ -1,22 +1,26 @@
 import { User } from "@/app/models";
 import { err, ok, Result } from "neverthrow";
+import { AppError } from "../error";
 
 export type AuthToken = string;
 
 export interface AuthApi {
-  getMe(): Promise<Result<User | null, string>>;
-  login(username: string, password: string): Promise<Result<AuthToken, string>>;
+  getMe(): Promise<Result<User | null, AppError>>;
+  login(
+    username: string,
+    password: string
+  ): Promise<Result<AuthToken, AppError>>;
   register(
     username: string,
     password: string
-  ): Promise<Result<AuthToken, string>>;
+  ): Promise<Result<AuthToken, AppError>>;
   logout(): Promise<void>;
 }
 
 export interface AuthService {
-  getMe(): Promise<Result<User | null, string>>;
-  login(username: string, password: string): Promise<Result<void, string>>;
-  register(username: string, password: string): Promise<Result<void, string>>;
+  getMe(): Promise<Result<User | null, AppError>>;
+  login(username: string, password: string): Promise<Result<void, AppError>>;
+  register(username: string, password: string): Promise<Result<void, AppError>>;
   logout(): Promise<void>;
 }
 

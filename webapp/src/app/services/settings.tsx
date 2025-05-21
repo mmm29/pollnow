@@ -1,4 +1,5 @@
 import { Result } from "neverthrow";
+import { AppError } from "../error";
 
 export type ChangePasswordRequest = {
   oldPassword: string;
@@ -7,5 +8,7 @@ export type ChangePasswordRequest = {
 };
 
 export interface SettingsService {
-  changePassword(request: ChangePasswordRequest): Promise<Result<void, string>>;
+  changePassword(
+    request: ChangePasswordRequest
+  ): Promise<Result<void, AppError>>;
 }

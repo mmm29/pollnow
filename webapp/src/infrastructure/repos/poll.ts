@@ -5,6 +5,7 @@ import { Poll, PollId } from "@/app/models";
 import { PollResponse } from "../api/dto";
 import { PollService } from "@/app/services/poll";
 import { PollCompletion } from "@/app/models/poll";
+import { AppError } from "@/app/error";
 
 function mapPoll(r: PollResponse): Poll {
   return {
@@ -27,7 +28,7 @@ export class PollApi implements PollService {
     this.apiClient = apiClient;
   }
 
-  async createPoll(poll: PollDesc): Promise<Result<PollId, string>> {
+  async createPoll(poll: PollDesc): Promise<Result<PollId, AppError>> {
     const result = await this.apiClient.createPoll(poll);
     if (!result.ok) {
       return err(result.error_message);
@@ -36,7 +37,7 @@ export class PollApi implements PollService {
     return ok(result.data);
   }
 
-  async getAllPolls(): Promise<Result<Poll[], string>> {
+  async getAllPolls(): Promise<Result<Poll[], AppError>> {
     const result = await this.apiClient.getAllPolls();
     if (!result.ok) {
       return err(result.error_message);
@@ -47,7 +48,7 @@ export class PollApi implements PollService {
     return ok(polls);
   }
 
-  async findPollById(pollId: PollId): Promise<Result<Poll, string>> {
+  async findPollById(pollId: PollId): Promise<Result<Poll, AppError>> {
     const result = await this.apiClient.getPollById(pollId);
     if (!result.ok) {
       return err(result.error_message);
@@ -57,7 +58,7 @@ export class PollApi implements PollService {
     return ok(poll);
   }
 
-  async deletePoll(pollId: PollId): Promise<Result<void, string>> {
+  async deletePoll(pollId: PollId): Promise<Result<void, AppError>> {
     const result = await this.apiClient.deletePoll(pollId);
     if (!result.ok) {
       return err(result.error_message);
@@ -69,7 +70,7 @@ export class PollApi implements PollService {
   async completePoll(
     pollId: PollId,
     completion: PollCompletion
-  ): Promise<Result<void, string>> {
+  ): Promise<Result<void, AppError>> {
     const result = await this.apiClient.completePoll(pollId, {
       option_id: completion.option_id,
     });
@@ -81,7 +82,7 @@ export class PollApi implements PollService {
     return ok();
   }
 
-  async uncompletePoll(pollId: PollId): Promise<Result<void, string>> {
+  async uncompletePoll(pollId: PollId): Promise<Result<void, AppError>> {
     const result = await this.apiClient.uncompletePoll(pollId);
 
     if (!result.ok) {

@@ -4,6 +4,7 @@ import {
 } from "@/app/services/settings";
 import { err, ok, Result } from "neverthrow";
 import { ApiClient } from ".";
+import { AppError } from "@/app/error";
 
 export class SettingsApi implements SettingsService {
   apiClient: ApiClient;
@@ -14,7 +15,7 @@ export class SettingsApi implements SettingsService {
 
   async changePassword(
     request: ChangePasswordRequest
-  ): Promise<Result<void, string>> {
+  ): Promise<Result<void, AppError>> {
     if (request.newPassword !== request.confirmPassword) {
       return err("Passwords do not match");
     }

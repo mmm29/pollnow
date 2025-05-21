@@ -2,6 +2,7 @@ import { User } from "@/app/models";
 import { AuthApi, AuthToken } from "@/app/services/auth";
 import { err, ok, Result } from "neverthrow";
 import { ApiClient } from ".";
+import { AppError } from "@/app/error";
 
 export class AuthApiImpl implements AuthApi {
   apiClient: ApiClient;
@@ -10,7 +11,7 @@ export class AuthApiImpl implements AuthApi {
     this.apiClient = apiClient;
   }
 
-  async getMe(): Promise<Result<User | null, string>> {
+  async getMe(): Promise<Result<User | null, AppError>> {
     const result = await this.apiClient.getMe();
 
     if (!result.ok) {
@@ -23,7 +24,7 @@ export class AuthApiImpl implements AuthApi {
   async login(
     username: string,
     password: string
-  ): Promise<Result<AuthToken, string>> {
+  ): Promise<Result<AuthToken, AppError>> {
     const result = await this.apiClient.login({
       username,
       password,
@@ -31,14 +32,14 @@ export class AuthApiImpl implements AuthApi {
     if (!result.ok) {
       return err(result.error_message);
     }
-    
+
     return ok(result.data);
   }
 
   async register(
     username: string,
     password: string
-  ): Promise<Result<AuthToken, string>> {
+  ): Promise<Result<AuthToken, AppError>> {
     const result = await this.apiClient.createUser({
       username,
       password,
