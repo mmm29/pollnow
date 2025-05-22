@@ -20,8 +20,8 @@ function LoginPageContainer({ title, children }: LoginPageCoreProps) {
   }
 
   return (
-    <Container title={title}>
-      <div className="md:w-[40vh] md:mt-8 m-auto">{children}</div>
+    <Container title={title} childSpace="md">
+      {children}
     </Container>
   );
 }

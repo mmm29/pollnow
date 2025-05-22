@@ -60,7 +60,7 @@ export function NewPollPage() {
   }
 
   return (
-    <Container title="New poll">
+    <Container title="New poll" childSpace="lg">
       <form onSubmit={handleSubmit}>
         <Section>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8">

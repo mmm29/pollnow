@@ -48,21 +48,23 @@ function UncompletedPoll({ poll, reload }: UncompletedPollProps) {
   return (
     <>
       <form onSubmit={onComplete}>
-        <RadioGroup value={selection} onChange={setSelection}>
-          {poll.options.map((option) => (
-            <Field key={option.id} className="flex items-center gap-2">
-              <Radio
-                value={option.id}
-                className="group flex size-5 items-center justify-center rounded-full border bg-white data-checked:bg-blue-400"
-              >
-                <span className="invisible size-2 rounded-full bg-white group-data-checked:visible" />
-              </Radio>
-              <Label>{option.text}</Label>
-            </Field>
-          ))}
-        </RadioGroup>
+        <div className="border border-gray-300 rounded-md p-4 flex flex-col space-y-4">
+          <RadioGroup value={selection} onChange={setSelection}>
+            {poll.options.map((option) => (
+              <Field key={option.id} className="flex items-center gap-2">
+                <Radio
+                  value={option.id}
+                  className="group flex size-5 items-center justify-center rounded-full border bg-white data-checked:bg-blue-400"
+                >
+                  <span className="invisible size-2 rounded-full bg-white group-data-checked:visible" />
+                </Radio>
+                <Label>{option.text}</Label>
+              </Field>
+            ))}
+          </RadioGroup>
+        </div>
 
-        <div className="mt-4">
+        <div className="mt-4 flex justify-end">
           <Status status={status} />
           <Button variant="primary" type="submit">
             Complete
@@ -149,7 +151,7 @@ function CompletedPoll({ poll, reload }: CompletedPollProps) {
         ))}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex justify-end">
         <Button variant="primary" onClick={onUncomplete}>
           Uncomplete
         </Button>
@@ -179,7 +181,7 @@ function PollEdit({ poll }: { poll: Poll }) {
     <div>
       <Status status={status} />
 
-      <div className="mt-4">
+      <div className="mt-4 flex justify-end">
         <Button variant="soft" onClick={onDelete}>
           Delete poll
         </Button>
@@ -247,7 +249,7 @@ function PageContent() {
 
 export function PollPage() {
   return (
-    <Container title="Poll">
+    <Container title="Poll" childSpace="lg">
       <PageContent />
     </Container>
   );
