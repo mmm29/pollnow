@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 from pydantic import BaseModel
 
 
@@ -10,6 +10,10 @@ class PollForm(BaseModel):
     title: str
     description: str
     options: List[PollOptionForm]
+
+
+class PollStatistics(BaseModel):
+    distribution: Dict[str, int]
 
 
 class PollOptionResponse(BaseModel):
@@ -25,6 +29,7 @@ class PollResponse(BaseModel):
     completed: bool
     can_edit: bool
     options: List[PollOptionResponse]
+    statistics: PollStatistics
 
 
 class PollCompletionRequest(BaseModel):

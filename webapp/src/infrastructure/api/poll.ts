@@ -19,6 +19,7 @@ function mapPoll(r: PollResponse): Poll {
       text: opt.text,
       selected: opt.selected,
     })),
+    statistics: r.statistics,
   };
 }
 

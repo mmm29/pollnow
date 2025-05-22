@@ -2,8 +2,9 @@ from typing import List, Optional, Literal
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlmodel import select, delete
+from collections import Counter
 
-from .dto import PollCompletionRequest, PollForm, PollResponse, PollOptionResponse
+from .dto import PollCompletionRequest, PollForm, PollResponse, PollOptionResponse, PollStatistics
 from .models import Poll, PollCompletion, PollOption, User
 from .store import get_session, Session
 from .errors import InsufficientPermissions, ResourceNotFound, ValidationError
@@ -20,7 +21,33 @@ class CreatePollResponse(BaseModel):
     poll_id: str
 
 
-def map_poll_to_response(poll: Poll, user: Optional[User], session: Session) -> PollResponse:
+def collect_poll_statistics(session: Session, poll: Poll, normalize: bool) -> PollStatistics:
+    option_distribution = Counter(
+        completion.option_id for completion in poll.completions)
+
+    all_option_ids = [option.id for option in poll.options]
+
+    total_num = len(poll.completions)
+    NORMALIZE_TARGET = 100_000
+
+    def map_number(option_id: int):
+        if option_id not in option_distribution:
+            return 0
+
+        if normalize:
+            return round(option_distribution[option_id] / total_num * NORMALIZE_TARGET)
+        else:
+            return option_distribution[option_id]
+
+    final_distribution = {
+        str(option_id): map_number(option_id)
+        for option_id in all_option_ids
+    }
+
+    return PollStatistics(distribution=final_distribution)
+
+
+def create_poll_response(poll: Poll, user: Optional[User], session: Session) -> PollResponse:
     selected_option_id = None
     if user is not None:
         completion = session.exec(select(PollCompletion).where(
@@ -39,13 +66,16 @@ def map_poll_to_response(poll: Poll, user: Optional[User], session: Session) -> 
         for option in poll.options
     ]
 
+    statistics = collect_poll_statistics(session, poll, False)
+
     return PollResponse(
         id=str(poll.id),
         title=poll.title,
         description=poll.description,
         completed=selected_option_id is not None,
         options=options,
-        can_edit=can_edit
+        can_edit=can_edit,
+        statistics=statistics
     )
 
 
@@ -96,7 +126,7 @@ async def delete_poll(poll_id: int, session: Session = Depends(get_session), use
 @router.get("/poll/{poll_id}", response_model=PollResponse)
 async def get_poll_by_id(poll_id: int, session: Session = Depends(get_session), user: Optional[User] = Depends(get_session_user)):
     poll = find_poll_by_id(session, poll_id)
-    return map_poll_to_response(poll, user, session)
+    return create_poll_response(poll, user, session)
 
 
 @router.get("/poll", response_model=List[PollResponse])
@@ -111,7 +141,7 @@ async def get_polls(select_filter: Literal["all", "my"] = Query(alias='select'),
         raise ValidationError('invalid param value')
 
     polls = session.exec(query).all()
-    return list(map(lambda poll: map_poll_to_response(poll, user, session), polls))
+    return list(map(lambda poll: create_poll_response(poll, user, session), polls))
 
 
 @router.delete('/poll/{poll_id}/completion')

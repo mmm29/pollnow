@@ -10,6 +10,8 @@ import {
   Status,
   StatusType,
 } from "../components/primitives/Status";
+import { PollOptionId, PollStatistics } from "@/app/models/poll";
+import clsx from "clsx";
 
 type UncompletedPollProps = {
   poll: Poll;
@@ -60,10 +62,12 @@ function UncompletedPoll({ poll, reload }: UncompletedPollProps) {
           ))}
         </RadioGroup>
 
-        <Status status={status} />
-        <Button variant="primary" type="submit">
-          Complete
-        </Button>
+        <div className="mt-4">
+          <Status status={status} />
+          <Button variant="primary" type="submit">
+            Complete
+          </Button>
+        </div>
       </form>
     </>
   );
@@ -77,9 +81,7 @@ type CompletedPollProps = {
 function CompletedPoll({ poll, reload }: CompletedPollProps) {
   const { pollService } = useApp();
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
+  async function onUncomplete() {
     const result = await pollService.uncompletePoll(poll.id);
     if (result.isErr()) {
       // TODO: handle error
@@ -89,19 +91,69 @@ function CompletedPoll({ poll, reload }: CompletedPollProps) {
     reload?.();
   }
 
+  type OptionStats = {
+    percentage: number;
+    total: number;
+  };
+
+  function calculateStats(
+    stats: PollStatistics
+  ): Record<PollOptionId, OptionStats> {
+    const totalCompletions = Object.values(stats.distribution).reduce(
+      (total, val) => total + val,
+      0
+    );
+    const targetTotal = 100;
+
+    function mapValue(value: number): OptionStats {
+      return {
+        percentage: (value / totalCompletions) * targetTotal,
+        total: value,
+      };
+    }
+
+    return Object.fromEntries(
+      Object.entries(stats.distribution).map(([key, value]) => [
+        key,
+        mapValue(value),
+      ])
+    );
+  }
+
+  const optionStats = poll.statistics ? calculateStats(poll.statistics) : {};
+
   return (
     <>
-      <form onSubmit={onSubmit}>
+      <div className="border border-gray-300 rounded-md p-4 flex flex-col space-y-4">
         {poll.options.map((option) => (
           <>
-            <p className={option.selected ? "font-bold" : ""}>{option.text}</p>
+            <div
+              className={clsx(
+                "flex items-center justify-between",
+                option.selected ? "font-bold" : ""
+              )}
+            >
+              <div>
+                {option.text}
+                {}
+              </div>
+              <div>
+                {option.id in optionStats ? (
+                  <>{optionStats[option.id].percentage.toFixed(1)} %</>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </div>
           </>
         ))}
+      </div>
 
-        <Button variant="primary" type="submit">
+      <div className="mt-4">
+        <Button variant="primary" onClick={onUncomplete}>
           Uncomplete
         </Button>
-      </form>
+      </div>
     </>
   );
 }
@@ -127,9 +179,11 @@ function PollEdit({ poll }: { poll: Poll }) {
     <div>
       <Status status={status} />
 
-      <Button variant="soft" onClick={onDelete}>
-        Delete
-      </Button>
+      <div className="mt-4">
+        <Button variant="soft" onClick={onDelete}>
+          Delete poll
+        </Button>
+      </div>
     </div>
   );
 }
@@ -179,12 +233,14 @@ function PageContent() {
     <>
       <h1 className="text-gray-800 font-semibold text-2xl">{title}</h1>
       {description && <h2 className="text-gray-600 text-xl">{description}</h2>}
-      {poll.completed ? (
-        <CompletedPoll poll={poll} reload={reload} />
-      ) : (
-        <UncompletedPoll poll={poll} reload={reload} />
-      )}
-      {poll.canEdit && <PollEdit poll={poll} />}
+      <div className="mt-4">
+        {poll.completed ? (
+          <CompletedPoll poll={poll} reload={reload} />
+        ) : (
+          <UncompletedPoll poll={poll} reload={reload} />
+        )}
+        {poll.canEdit && <PollEdit poll={poll} />}
+      </div>
     </>
   );
 }

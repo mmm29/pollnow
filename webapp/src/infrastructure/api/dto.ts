@@ -4,6 +4,10 @@ export type PollOptionResponse = {
   selected: boolean;
 };
 
+export type PollStatistics = {
+  distribution: Record<string, number>;
+};
+
 export type PollResponse = {
   id: string;
   title: string;
@@ -11,6 +15,7 @@ export type PollResponse = {
   completed: boolean;
   can_edit: boolean;
   options: PollOptionResponse[];
+  statistics: PollStatistics | null;
 };
 
 export type PollCompletion = {

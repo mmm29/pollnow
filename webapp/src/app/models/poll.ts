@@ -5,6 +5,10 @@ export type PollCompletion = {
   option_id: PollOptionId;
 };
 
+export type PollStatistics = {
+  distribution: Record<string, number>;
+};
+
 export type PollOption = {
   id: PollOptionId;
   text: string;
@@ -18,4 +22,5 @@ export type Poll = {
   canEdit: boolean;
   description: string | null;
   options: PollOption[];
+  statistics: PollStatistics | null;
 };

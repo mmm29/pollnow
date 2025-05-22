@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, UniqueConstraint
 
 
 class User(SQLModel, table=True):
@@ -31,6 +31,11 @@ class Poll(SQLModel, table=True):
 
 
 class PollCompletion(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint("user_id", "poll_id",
+                         name="unique_user_poll"),
+    )
+
     id: int | None = Field(default=None, primary_key=True)
 
     user_id: Optional[int] = Field(foreign_key='user.id')
