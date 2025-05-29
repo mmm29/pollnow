@@ -1,0 +1,16 @@
+services:
+  server:
+    build:
+      context: ../server
+      dockerfile: ../docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+
+  webapp:
+    build:
+      context: ../webapp
+      dockerfile: ../docker/Dockerfile.frontend
+    ports:
+      - "6655:80"
+    depends_on:
+      - server

@@ -13,7 +13,7 @@ class AuthFailed(ResourceNotFound):
 
 class NotAutenticated(HTTPException):
     def __init__(self):
-        super().__init__(status_code=403, detail="Not authenticated")
+        super().__init__(status_code=401, detail="Not authenticated")
 
 
 class AlreadyExists(HTTPException):
