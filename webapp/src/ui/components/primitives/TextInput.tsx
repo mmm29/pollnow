@@ -8,6 +8,7 @@ type TextInputProps = {
   placeholder?: string;
   value?: string;
   textarea?: boolean;
+  password?: boolean;
   onChange?: InputChangeHandler;
 };
 
@@ -20,6 +21,7 @@ export function TextInput({
   placeholder,
   value,
   textarea,
+  password,
   onChange,
 }: TextInputProps) {
   function handleChange(
@@ -30,6 +32,8 @@ export function TextInput({
       onChange(value);
     }
   }
+
+  const type = password ? "password" : undefined;
 
   return (
     <>
@@ -45,6 +49,7 @@ export function TextInput({
         <Input
           className={STYLES}
           placeholder={placeholder}
+          type={type}
           value={value}
           onChange={handleChange}
         />

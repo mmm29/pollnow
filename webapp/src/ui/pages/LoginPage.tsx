@@ -61,6 +61,7 @@ export function LoginPage() {
       <Field label="Password">
         <TextInput
           value={password}
+          password
           onChange={(password) => setPassword(password)}
         />
       </Field>
@@ -111,6 +112,7 @@ export function RegisterPage() {
       <Field label="Password">
         <TextInput
           value={password}
+          password
           onChange={(password) => setPassword(password)}
         />
       </Field>
